@@ -1,78 +1,129 @@
-# Webapp – Bank Marketing AI Predictor
+# 🍷 Wine Quality Assessment Webapp
 
-Webapp Streamlit che carica un modello registrato in MLflow e permette di stimare la probabilità che un cliente sottoscriva un deposito a termine.
+Sistema di valutazione della qualità del vino per supportare le decisioni di affinamento in cantina.
 
-## Struttura
+## 📋 Descrizione
 
-- `app_bank.py`: applicazione Streamlit per predizioni Bank Marketing
-- `app_house.py`: applicazione Streamlit per predizioni House Sales
-- `config.py`: configurazione modello MLflow (IMPORTANTE: modificabile dai partecipanti)
-- `model_utils.py`: funzioni di utilità per caricare modelli e fare predizioni
-- `assets/styles.css`: stile CSS personalizzato della webapp
-- `requirements.txt`: dipendenze Python necessarie
+Webapp Streamlit moderna ed elegante che utilizza modelli di Machine Learning per valutare la qualità del vino basandosi su analisi chimico-fisiche. Il sistema aiuta l'enologo a decidere quali lotti destinare all'affinamento in barrique.
 
-## Configurazione
+## 🚀 Avvio
 
-Prima di lanciare l'app, verifica il file `config.py`:
+```bash
+cd capstone_project
+streamlit run app.py
+```
+
+## 🎯 Funzionalità
+
+### Caricamento Dinamico del Modello
+- **Strategia a fallback intelligente**:
+  1. Prova a caricare dal **MLflow Registry** (`wine_clf@production`)
+  2. Se fallisce, cerca una cartella `model/` nella working directory
+- Estrae dinamicamente le feature richieste dal modello
+- Nome del modello configurabile in `config.py`
+- Supporta formati: `.pkl`, `.joblib`
+
+### Interface Intelligente
+- **11 sliders interattivi** per parametri chimico-fisici
+- **Tooltip informativi** (hover su ⓘ) per ogni parametro
+- Visualizza solo le feature richieste dal modello specifico
+- **🎲 Generazione Random**: crea campioni di vino casuali per testare il modello
+- **Predizione Automatica**: aggiorna la valutazione istantaneamente al cambio dei parametri
+
+### Valutazione Dinamica
+Il sistema fornisce 4 livelli di raccomandazione:
+
+| Livello | Probabilità | Raccomandazione |
+|---------|-------------|-----------------|
+| 🍷 **Eccellente** | ≥ 75% | Affinamento in Barrique - Invecchiamento in cantina di pregio |
+| 🍇 **Buono** | 50-74% | Affinamento Controllato - Affinamento breve |
+| 📦 **Medio** | 30-49% | Imbottigliamento Diretto - Commercializzazione immediata |
+| ⚗️ **Base** | < 30% | Assemblaggio - Utilizzo per blend |
+
+### Design Moderno
+- **Tema cantina**: sfondo gradient bordeaux/marrone
+- **Colori dinamici**: cambiano in base alla qualità predetta
+- **Font eleganti**: Playfair Display + Lato
+- **Layout responsivo**: 2 colonne (input | risultato)
+
+## ⚙️ Configurazione
+
+Modifica `config.py` per personalizzare:
 
 ```python
-MLFLOW_TRACKING_URI = "file:../mlruns"          # URI del tracking server
-MLFLOW_MODEL_NAME = "bank_marketing_model"      # Nome del modello registrato
-MLFLOW_MODEL_ALIAS = "production"                # Alias del modello da caricare
+# Nome del modello nel registry
+MLFLOW_MODEL_NAME = "wine_clf"
+MLFLOW_MODEL_ALIAS = "production"
+
+# Soglie di qualità
+QUALITY_THRESHOLDS = {
+    "excellent": 0.75,
+    "good": 0.50,
+    "medium": 0.30
+}
 ```
 
-**Nota per i partecipanti**: Puoi modificare `MLFLOW_MODEL_NAME` e `MLFLOW_MODEL_ALIAS` per testare modelli diversi registrati in MLflow.
+## 📊 Features Analizzate
 
-## Come eseguire
+Il modello analizza 11 parametri chimico-fisici:
 
-### Dalla root del progetto (cartella 3.0):
+1. **Fixed Acidity** (g/L) - Acidità fissa (acido tartarico)
+2. **Volatile Acidity** (g/L) - Acidità volatile (acido acetico)
+3. **Citric Acid** (g/L) - Acido citrico
+4. **Residual Sugar** (g/L) - Zuccheri residui
+5. **Chlorides** (g/L) - Cloruri (sale)
+6. **Free Sulfur Dioxide** (mg/L) - SO₂ libero
+7. **Total Sulfur Dioxide** (mg/L) - SO₂ totale
+8. **Density** (g/cm³) - Densità
+9. **pH** - Livello di acidità
+10. **Sulphates** (g/L) - Solfati
+11. **Alcohol** (% vol) - Gradazione alcolica
 
-```bash
-streamlit run Webapp/app_bank.py
-```
+## 🔧 Dipendenze
 
-L'applicazione si aprirà automaticamente nel browser all'indirizzo http://localhost:8501
-
-### Alternative:
-
-Se preferisci, puoi anche spostarti nella cartella Webapp:
-
-```bash
-cd Webapp
-streamlit run app_bank.py
-```
-
-## Funzionalità
-
-- **Caricamento dinamico del modello**: legge automaticamente il modello dal Model Registry MLflow
-- **Interfaccia adattiva**: genera controlli UI basati sulle feature del modello
-- **Preprocessing automatico**: la pipeline gestisce tutte le trasformazioni necessarie
-- **Predizione in tempo reale**: calcola la probabilità di sottoscrizione immediatamente
-- **Visualizzazione avanzata**: grafici, probabilità, raccomandazioni
-
-## Troubleshooting
-
-**Errore: "Model not found"**
-- Verifica che il modello sia registrato in MLflow con il nome corretto
-- Controlla che l'alias sia stato assegnato (es. `production`)
-- Verifica che il tracking URI sia corretto (`file:../mlruns`)
-
-**Errore: "Feature mismatch"**
-- Il modello si aspetta feature diverse da quelle fornite
-- Assicurati di aver addestrato il modello con le feature corrette
-- Verifica che il dataset di riferimento sia presente in `Dati/`
-
-## Requisiti
-
-- Python 3.11+
-- Streamlit
-- MLflow
+Vedi `requirements.txt`:
+- streamlit
+- mlflow
 - scikit-learn
 - pandas
 - numpy
 
-Installa le dipendenze con:
+## 📁 Struttura
 
-```bash
-pip install -r requirements.txt
 ```
+capstone_project/
+├── app.py              # Webapp Streamlit
+├── config.py           # Configurazione
+├── model_utils.py      # Utilità modello MLflow
+├── development.ipynb   # Training del modello
+├── mlruns/             # MLflow tracking
+├── model/              # (Opzionale) Modello locale come fallback
+│   └── model.pkl       # Pipeline sklearn serializzata
+└── requirements.txt    # Dipendenze
+```
+
+## 🔧 Deployment
+
+### Opzione 1: Con MLflow Registry (Raccomandato)
+```bash
+# Il modello viene caricato automaticamente dal registry
+streamlit run app.py
+```
+
+### Opzione 2: Con Modello Locale
+Se MLflow non è disponibile, crea una cartella `model/`:
+```bash
+mkdir model
+# Copia il tuo modello (pipeline.pkl o model.pkl)
+cp /path/to/your/model.pkl model/
+streamlit run app.py
+```
+
+La webapp rileverà automaticamente la fonte migliore disponibile.
+
+## 🎓 Dataset
+
+UCI Machine Learning Repository - Wine Quality Dataset (ID: 186)
+- Vini portoghesi "Vinho Verde"
+- 6,497 campioni
+- Classificazione binaria: alta qualità (≥7) vs standard
